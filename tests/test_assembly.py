@@ -430,3 +430,35 @@ def test_toCompound(simple_assy, nested_assy):
     assert cq.Vector(0, 0, 18) in [x.Center() for x in c3.Faces()]
     # also check with bounding box
     assert c3.BoundingBox().zlen == pytest.approx(18)
+
+
+def test_infinite_face_constraint():
+    """
+    An OCCT infinite face has a center at (1e99, 1e99), but when a user uses it
+    in a constraint, the center should be at (0, 0).
+    """
+
+    def derive_plane(f: cq.Face):
+        c0 = cq.assembly.Constraint(
+            ("point", "plane"),
+            (cq.Vertex.makeVertex(10, 10, 10), f),
+            sublocs=(cq.Location(), cq.Location()),
+            kind="PointInPlane"
+        )
+        p0 = c0._getPlane(c0.args[1])
+        return p0
+
+    f0 = cq.Face.makePlane(length=None, width=None, basePnt=(0, 0, 0), dir=(0, 0, 1))
+    assert derive_plane(f0).origin == cq.Vector(0, 0, 0)
+
+    f1 = cq.Face.makePlane(None, None, (10, 10, 10))
+    assert derive_plane(f1).origin == cq.Vector(0, 0, 10)
+
+    f2 = cq.Face.makePlane(None, None, (0, 0, 0), (1, 1, 1))
+    assert derive_plane(f2).origin == cq.Vector(0, 0, 0)
+
+    f3 = cq.Face.makePlane(None, None, (10, 10, 0), (1, 1, 0))
+    assert derive_plane(f3).origin == cq.Vector(10, 10, 0)
+
+    f4 = cq.Face.makePlane(None, None, (20, 0, 0), (1, 1, 0))
+    assert derive_plane(f4).origin == cq.Vector(10, 10, 0)
