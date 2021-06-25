@@ -207,6 +207,8 @@ Below is the complete code including the final solve step.
 
 .. cq_vtk::
     :height: 600px
+    :width: 1200px
+    :select: door
 
     import cadquery as cq
     
@@ -352,8 +354,6 @@ Below is the complete code including the final solve step.
     
     # solve
     door.solve()
-    
-    show_object(door,name='door')
 
 
 Data export

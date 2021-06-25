@@ -284,6 +284,7 @@ class cq_directive_vtk(Directive):
 
     def run(self):
 
+        print("running a vtk directive")
         options = self.options
         content = self.content
         state_machine = self.state_machine
@@ -294,9 +295,11 @@ class cq_directive_vtk(Directive):
         # only consider inline snippets
         plot_code = "\n".join(content)
 
+        print('starting to process the result')
         # collect the result
         try:
             result = cqgi.parse(plot_code).build()
+            print('finished cqgi.parse().build()')
 
             if result.success:
                 if result.first_result:
@@ -309,12 +312,15 @@ class cq_directive_vtk(Directive):
                 else:
                     assy = Assembly(shape, color=Color(*DEFAULT_COLOR))
             else:
+                print('about to raise an exception')
                 raise result.exception
 
         except Exception:
             traceback.print_exc()
             assy = Assembly(Compound.makeText("CQGI error", 10, 5))
 
+        print("about to export vtkjs")
+        print(plot_code)
         # save vtkjs to static
         fname = Path(str(uuid()))
         exporters.assembly.exportVTKJS(assy, out_path / fname)
@@ -323,8 +329,10 @@ class cq_directive_vtk(Directive):
         # add the output
         lines = []
 
+        print("dumpjson next")
         data = dumps(toJSON(assy))
 
+        print("process template")
         lines.extend(
             template_vtk.format(
                 code=indent(TEMPLATE_RENDER.format(), "    "),
@@ -342,8 +350,10 @@ class cq_directive_vtk(Directive):
         lines.append("")
 
         if len(lines):
+            print("state machine insert")
             state_machine.insert_input(lines, state_machine.input_lines.source(0))
 
+        print("returning")
         return []
 
 

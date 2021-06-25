@@ -103,12 +103,21 @@ def exportVTKJS(assy: AssemblyProtocol, path: str):
     renderer.ResetCamera()
     renderer.SetBackground(1, 1, 1)
 
+    # print('about to render')
+    # renderWindow.Render()
+    # print('rendering done')
+    import vtk
+    print(f"{vtk.__file__=}")
+
     with TemporaryDirectory() as tmpdir:
 
         exporter = vtkJSONSceneExporter()
         exporter.SetFileName(tmpdir)
         exporter.SetRenderWindow(renderWindow)
+        print("writing")
+        print(f"{tmpdir=}")
         exporter.Write()
+        print("written, now make archive")
         make_archive(path, "zip", tmpdir)
 
 

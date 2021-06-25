@@ -8,8 +8,11 @@ def exportVTP(
 
     writer = vtkXMLPolyDataWriter()
     writer.SetFileName(fname)
+    print("about to call toVtkPolyData")
     writer.SetInputData(shape.toVtkPolyData(tolerance, angularTolerance))
+    print("about to write")
     writer.Write()
+    print("finished write")
 
 
 def toString(

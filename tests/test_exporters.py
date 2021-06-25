@@ -101,6 +101,7 @@ class TestExporters(BaseTest):
     def testVTP(self):
 
         exporters.export(self._box(), "out.vtp")
+        exporters.export(self._box(), "out1.vtp")
 
         with open("out.vtp") as f:
             res = f.read(100)
